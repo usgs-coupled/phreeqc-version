@@ -15,21 +15,22 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
+  init:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    # Map step outputs to a job outputs
+    outputs:
+      VER: ${{ steps.vars.outputs.VER }}
+      REL: ${{ steps.vars.outputs.REL }}
+      DATE: ${{ steps.vars.outputs.DATE }}
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      # Runs a single command using the runners shell
+      # output
       - name: Run a one-line script
         id: vars
         run: |
-          ##{{
           VER=$(cat phreeqc-version.txt)
           ver_major=$(echo "$VER" | awk -F. '{print $1}')
           ver_minor=$(echo "$VER" | awk -F. '{print $2}') 
@@ -44,14 +45,16 @@ jobs:
               ver_patch=$((ver_patch+1))    
             fi
           fi          
-          ##}}
           echo ::set-output name=VER::${ver_major}.${ver_minor}.${ver_patch}
           echo ::set-output name=REL::$(python ver.py)
           echo ::set-output name=DATE::$(date "+%x")
 
-      # Runs a set of commands using the runners shell
+  build:
+    needs: init
+    runs-on: windows-latest
+    steps:
       - name: Run a multi-line script
         run: |
-          echo VER=${{ steps.vars.outputs.VER }}
-          echo REL=${{ steps.vars.outputs.REL }}
-          echo DATE=${{ steps.vars.outputs.DATE }}
+          echo VER=${{ needs.init.outputs.VER }}
+          echo REL=${{ needs.init.outputs.REL }}
+          echo DATE=${{ needs.init.outputs.DATE }}
