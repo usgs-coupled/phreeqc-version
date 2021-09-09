@@ -49,8 +49,23 @@ jobs:
           echo ::set-output name=REL::$(python ver.py)
           echo ::set-output name=DATE::$(date "+%x")
 
+  hello_world_job:
+    runs-on: ubuntu-latest
+    outputs:
+      TIME: ${{ steps.hello.outputs.time }}
+    name: A job to say hello
+    steps:
+      - name: Hello world action step
+        id: hello
+        uses: usgs-coupled/hw-docker-action@v1
+        with:
+          who-to-greet: 'Mona the Octocat'
+      # Use the output from the `hello` step
+      - name: Get the output time
+        run: echo "The time was ${{ steps.hello.outputs.time }}"
+
   build:
-    needs: init
+    needs: [init, hello_world_job]
     runs-on: windows-latest
     steps:
       - name: Run a multi-line script
@@ -58,3 +73,4 @@ jobs:
           echo VER=${{ needs.init.outputs.VER }}
           echo REL=${{ needs.init.outputs.REL }}
           echo DATE=${{ needs.init.outputs.DATE }}
+          echo TIME=${{ needs.hello_world_job.outputs.TIME }}
