@@ -57,7 +57,7 @@ jobs:
     steps:
       - name: Hello world action step
         id: hello
-        uses: usgs-coupled/hw-docker-action@v3
+        uses: usgs-coupled/hw-docker-action@v4
         with:
           who-to-greet: 'Mona the Octocat'
       # Use the output from the `hello` step
