@@ -31,7 +31,7 @@ jobs:
       - name: Run a one-line script
         id: vars
         run: |
-          echo ::set-output name=VER::${sh ./next_ver.sh}
+          echo ::set-output name=VER::$(sh ./next_ver.sh)
           echo ::set-output name=REL::$(python ./rel.py)
           echo ::set-output name=DATE::$(date "+%x")
 
