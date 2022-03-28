@@ -31,46 +31,26 @@ jobs:
       - name: Run a one-line script
         id: vars
         run: |
-          VER=$(cat phreeqc-version.txt)
-          ver_major=$(echo "$VER" | awk -F. '{print $1}')
-          ver_minor=$(echo "$VER" | awk -F. '{print $2}') 
-          if [ -z "$ver_minor" ]; then
-            ver_minor=0
-            ver_patch=0
-          else
-            ver_patch=$(echo "$VER" | awk -F. '{print $3}')
-            if [ -z "$ver_patch" ]; then
-              ver_patch=0
-            else
-              ver_patch=$((ver_patch+1))    
-            fi
-          fi          
-          echo ::set-output name=VER::${ver_major}.${ver_minor}.${ver_patch}
-          echo ::set-output name=REL::$(python ver.py)
+          echo ::set-output name=VER::${sh ./next_ver.sh}
+          echo ::set-output name=REL::$(python ./rel.py)
           echo ::set-output name=DATE::$(date "+%x")
 
-  hello_world_job:
-    runs-on: ubuntu-latest
-    outputs:
-      TIME: ${{ steps.hello.outputs.time }}
-    name: A job to say hello
-    steps:
-      - name: Hello world action step
-        id: hello
-        uses: usgs-coupled/hw-javascript-action@v1.2
-        with:
-          who-to-greet: 'Mona the Octocat'
-      # Use the output from the `hello` step
-      - name: Get the output time
-        run: echo "The time was ${{ steps.hello.outputs.time }}"
-
-  build:
-    needs: [init, hello_world_job]
+  windows-latest:
+    needs: [init]
     runs-on: windows-latest
     steps:
-      - name: Run a multi-line script
+      - name: echo
         run: |
           echo VER=${{ needs.init.outputs.VER }}
           echo REL=${{ needs.init.outputs.REL }}
           echo DATE=${{ needs.init.outputs.DATE }}
-          echo TIME="${{ needs.hello_world_job.outputs.TIME }}"
+
+  ubuntu-latest:
+    needs: [init]
+    runs-on: ubuntu-latest
+    steps:
+      - name: echo
+        run: |
+          echo VER=${{ needs.init.outputs.VER }}
+          echo REL=${{ needs.init.outputs.REL }}
+          echo DATE=${{ needs.init.outputs.DATE }}
