@@ -7,7 +7,7 @@
 # VER=4.0   # -> 4.0.0
 # VER=4.0.0 # -> 4.0.1
 #
-VER=$(curl -sS https://raw.githubusercontent.com/usgs-coupled/phreeqc-version/main/phreeqc-version.txt)
+VER=$(curl --ssl-no-revoke -sS https://raw.githubusercontent.com/usgs-coupled/phreeqc-version/main/phreeqc-version.txt)
 ver_major=$(echo "$VER" | awk -F. '{print $1}')
 ver_minor=$(echo "$VER" | awk -F. '{print $2}')
 if [ -z "$ver_minor" ]; then
